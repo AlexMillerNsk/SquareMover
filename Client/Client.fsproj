@@ -12,6 +12,8 @@
   <ItemGroup>
     <PackageReference Include="Elmish" Version="4.0.1" />
     <PackageReference Include="Elmish.Bridge.Client" Version="7.0.2" />
+    <PackageReference Include="Fable.Browser.Dom" Version="2.14.0" />
+    <PackageReference Include="Fable.Browser.Event" Version="1.5.0" />
     <PackageReference Include="Fable.Core" Version="4.0.0" />
     <PackageReference Include="Fable.Elmish.React" Version="4.0.0" />
     <PackageReference Include="Fable.Import.Browser" Version="1.4.0" />

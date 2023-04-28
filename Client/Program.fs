@@ -4,9 +4,9 @@ open Elmish
 open Feliz
 open Fable.Core
 open Elmish.React
-open Fable.Import
+open Browser.Types
 open Browser
-
+open Browser.Dom
 type Model = {
     isDragging: bool
     x: float
@@ -28,39 +28,70 @@ let update (msg:Msg) (model:Model) =
                                     let deltaX = be.clientX - model.x
                                     let deltaY = be.clientY - model.y
                                     let square = document.getElementById("square")
-                                    let prevX = float (square.style.left.Replace("px", ""))
-                                    let prevY = float (square.style.top.Replace("px", ""))
-                                    square.style.left <- string (prevX + deltaX) + "px"
-                                    square.style.top <- string (prevY + deltaY) + "px"
+                                    let prevX = square.offsetLeft
+                                    let prevY = square.offsetTop
+                                    square.offsetLeft <-  (prevX + deltaX) 
+                                    square.offsetTop <-  (prevY + deltaY) 
                                     {model with x = be.clientX; y = be.clientY}, Cmd.none
                                 else model, Cmd.none
 
 
-
-let div (classes: string list) (children: ReactElement list) =
-    Html.div [
-        prop.classes classes
-        prop.children children
-    ]
-
-let render model (dispatch: Msg -> unit) =
-    div [
-        prop.onMouseDown (fun _ -> dispatch HandleMouseDown)
-        prop.onMouseMove (fun _ -> dispatch HandleMouseDown )
-        prop.onMouseUp (fun _ -> dispatch HandleMouseUp ) 
-     ] 
-   
-        div [
-            prop.style [
-                "position", "absolute"
-                "width", "100px"
-                "height", "100px"
-                "background-color", "blue"
-                "left", "0px"
-                "top", "0px"
+                                    
+let inputField (model:Model) (dispatch: Msg -> unit) =
+  Html.div [
+    prop.classes [ "field"; "has-addons" ]
+    prop.children [
+      Html.div [
+        prop.classes [ "control"; "is-expanded"]
+        prop.children [
+          Html.input [
+            prop.classes [ "input"; "is-medium" ]
+            prop.valueOrDefault model.x
+          ]
+        ]
+      ]
+      Html.div [
+        prop.children [
+          Html.button [
+            prop.classes [ "button"; "is-primary"; "is-medium" ]
+            prop.children [
+              Html.i [ prop.classes [ "fa"; "fa-plus" ] ]
             ]
-            prop.id "square"
-        ] []
+          ]
+        ]
+      ]
+    ]
+  ]
+
+let inputField2 (model:Model) (dispatch: Msg -> unit) =
+    Html.div [
+        prop.id "square"
+        prop.children [
+          Html.canvas [
+            prop.classes [ "button"; "is-primary" ]
+            prop.width 200
+            prop.height 100
+            prop.onMouseDown (fun ev -> dispatch (HandleMouseDown ev))
+            prop.onMouseMove (fun ev -> dispatch (HandleMouseMove ev))
+            prop.onMouseUp (fun ev -> dispatch (HandleMouseUp ev))
+          ]
+        ]
+    ]
+let appTitle =
+  Html.p [
+    prop.className "title"
+    prop.text "Elmish To-Do List"
+  ]
+
+let render (model:Model) (dispatch: Msg -> unit) =
+  Html.div [
+    prop.style [ style.padding 20 ]
+    prop.children [
+      appTitle
+      inputField model dispatch
+      inputField2 model dispatch
+    ]
+  ]
 
 
 Program.mkProgram init update render
