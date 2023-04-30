@@ -1,9 +1,9 @@
 import { Union, Record } from "./fable_modules/fable-library.4.0.4/Types.js";
 import { union_type, class_type, record_type, float64_type, bool_type } from "./fable_modules/fable-library.4.0.4/Reflection.js";
 import { Cmd_none } from "./fable_modules/Fable.Elmish.4.0.0/cmd.fs.js";
-import { equals, createObj, int32ToString } from "./fable_modules/fable-library.4.0.4/Util.js";
 import { some } from "./fable_modules/fable-library.4.0.4/Option.js";
 import { createElement } from "react";
+import { equals, createObj } from "./fable_modules/fable-library.4.0.4/Util.js";
 import { join } from "./fable_modules/fable-library.4.0.4/String.js";
 import { singleton, ofArray } from "./fable_modules/fable-library.4.0.4/List.js";
 import { Interop_reactApi } from "./fable_modules/Feliz.2.6.0/./Interop.fs.js";
@@ -63,9 +63,9 @@ export function update(msg, model) {
         case 2: {
             const ev_2 = msg.fields[0];
             const textfordrop_1 = document.getElementById("textfordrop");
-            textfordrop_1.style.left = (int32ToString(333) + "px");
+            textfordrop_1.style.left = (ev_2.clientX.toString() + "px");
             console.log(some(textfordrop_1.style.left));
-            textfordrop_1.style.top = (int32ToString(359) + "px");
+            textfordrop_1.style.top = (ev_2.clientY.toString() + "px");
             console.log(some(textfordrop_1.style.top));
             return [new Model(false, model.x, model.y), Cmd_none()];
         }
@@ -90,6 +90,9 @@ export function modelStats(model, dispatch) {
 export function draggableSmthn(model, dispatch) {
     return createElement("p", {
         id: "textfordrop",
+        style: {
+            position: "initial",
+        },
         children: "tryin drop2",
         onDragStart: (ev) => {
             dispatch(new Msg(0, [ev]));

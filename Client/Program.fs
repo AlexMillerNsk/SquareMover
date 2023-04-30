@@ -39,9 +39,9 @@ let update (msg:Msg) (model:Model) =
                             else model, Cmd.none
 
     | OnDragEnd ev   -> let textfordrop = document.getElementById("textfordrop")
-                        textfordrop?style?left <- (string 333  + "px")
+                        textfordrop?style?left <- (string ev.clientX  + "px")
                         console.log textfordrop?style?left
-                        textfordrop?style?top  <- (string 359  + "px") 
+                        textfordrop?style?top  <- (string ev.clientY  + "px") 
                         console.log textfordrop?style?top
                         {model with isDragging = false}, Cmd.none
                                     
@@ -75,6 +75,7 @@ let modelStats (model:Model) (dispatch: Msg -> unit) =
 let draggableSmthn (model:Model) (dispatch: Msg -> unit) =
   Html.p [
     prop.id "textfordrop"
+    prop.style [style.position.initial]
     prop.text "tryin drop2"
     prop.onDragStart (fun ev -> dispatch (OnDragStart ev))
     prop.onDrag (fun ev -> dispatch (OnDrag ev))
