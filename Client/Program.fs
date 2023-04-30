@@ -39,9 +39,9 @@ let update (msg:Msg) (model:Model) =
                             else model, Cmd.none
 
     | OnDragEnd ev   -> let textfordrop = document.getElementById("textfordrop")
-                        textfordrop?style?left?Replace (string 333  + "px")
+                        textfordrop?style?left <- (string 333  + "px")
                         console.log textfordrop?style?left
-                        textfordrop?style?top?Replace (string 359  + "px") 
+                        textfordrop?style?top  <- (string 359  + "px") 
                         console.log textfordrop?style?top
                         {model with isDragging = false}, Cmd.none
                                     

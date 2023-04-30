@@ -63,9 +63,9 @@ export function update(msg, model) {
         case 2: {
             const ev_2 = msg.fields[0];
             const textfordrop_1 = document.getElementById("textfordrop");
-            textfordrop_1.style.left.Replace(int32ToString(333) + "px");
+            textfordrop_1.style.left = (int32ToString(333) + "px");
             console.log(some(textfordrop_1.style.left));
-            textfordrop_1.style.top.Replace(int32ToString(359) + "px");
+            textfordrop_1.style.top = (int32ToString(359) + "px");
             console.log(some(textfordrop_1.style.top));
             return [new Model(false, model.x, model.y), Cmd_none()];
         }
