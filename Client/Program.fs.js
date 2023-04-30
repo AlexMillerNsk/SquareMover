@@ -47,13 +47,6 @@ export function update(msg, model) {
         case 1: {
             const ev_1 = msg.fields[0];
             if (model.isDragging) {
-                const deltaX = ev_1.clientX - model.x;
-                const deltaY = ev_1.clientY - model.y;
-                const textfordrop = document.getElementById("textfordrop");
-                const prevX = textfordrop.style.left;
-                const prevY = textfordrop.style.top;
-                textfordrop.style.left = (prevX + deltaX);
-                textfordrop.style.top = (prevY + deltaY);
                 return [new Model(model.isDragging, ev_1.clientX, ev_1.clientY), Cmd_none()];
             }
             else {
@@ -62,11 +55,13 @@ export function update(msg, model) {
         }
         case 2: {
             const ev_2 = msg.fields[0];
-            const textfordrop_1 = document.getElementById("textfordrop");
-            textfordrop_1.style.left = (ev_2.clientX.toString() + "px");
-            console.log(some(textfordrop_1.style.left));
-            textfordrop_1.style.top = (ev_2.clientY.toString() + "px");
-            console.log(some(textfordrop_1.style.top));
+            const textfordrop = document.getElementById("textfordrop");
+            const droptarget = document.getElementById("droptarget");
+            textfordrop.style.left = (ev_2.clientX.toString() + "px");
+            console.log(some(textfordrop.style.left));
+            textfordrop.style.top = (ev_2.clientY.toString() + "px");
+            console.log(some(textfordrop.style.top));
+            const itog = droptarget.appendChild(textfordrop);
             return [new Model(false, model.x, model.y), Cmd_none()];
         }
         default: {
@@ -88,7 +83,11 @@ export function modelStats(model, dispatch) {
 }
 
 export function draggableSmthn(model, dispatch) {
-    return createElement("p", {
+    let elems;
+    return createElement("div", createObj(ofArray([["style", {
+        backgroundColor: "red",
+        width: 450,
+    }], (elems = [createElement("p", {
         id: "textfordrop",
         style: {
             position: "initial",
@@ -104,7 +103,7 @@ export function draggableSmthn(model, dispatch) {
             dispatch(new Msg(2, [ev_2]));
         },
         draggable: true,
-    });
+    })], ["children", Interop_reactApi.Children.toArray(Array.from(elems))])])));
 }
 
 export const dropTarget = createElement("div", {
@@ -113,6 +112,7 @@ export const dropTarget = createElement("div", {
         height: 300,
         left: 360,
         top: 260,
+        backgroundColor: "yellow",
     },
     id: "droptarget",
     className: join(" ", []),
