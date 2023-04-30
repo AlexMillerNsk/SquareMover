@@ -7,37 +7,45 @@ open Elmish.React
 open Browser.Types
 open Browser
 open Browser.Dom
+open Browser
+open Fable.Core.JsInterop
+
 type Model = {
     isDragging: bool
     x: float
     y: float}
 
 type Msg = 
-    |HandleMouseDown of MouseEvent
-    |HandleMouseMove of MouseEvent
-    |HandleMouseUp of MouseEvent
+    |OnDragStart of MouseEvent
+    |OnDrag of MouseEvent
+    |OnDragEnd of MouseEvent
 
 let init() = { isDragging = false; x = 0; y = 0 }, Cmd.none
 
 
 let update (msg:Msg) (model:Model) =
     match msg with
-    | HandleMouseDown be -> {model with isDragging = true; x = be.clientX; y = be.clientY}, Cmd.none                               
-    | HandleMouseUp   be -> {model with isDragging = false}, Cmd.none
-    | HandleMouseMove be ->     if model.isDragging then
-                                    let deltaX = be.clientX - model.x
-                                    let deltaY = be.clientY - model.y
-                                    let square = document.getElementById("square")
-                                    let prevX = square.offsetLeft
-                                    let prevY = square.offsetTop
-                                    square.offsetLeft <-  (prevX + deltaX) 
-                                    square.offsetTop <-  (prevY + deltaY) 
-                                    {model with x = be.clientX; y = be.clientY}, Cmd.none
-                                else model, Cmd.none
+    | OnDragStart ev -> {model with isDragging = true; x = ev.clientX; y = ev.clientY}, Cmd.none                               
 
+    | OnDrag ev -> if model.isDragging then
+                                let deltaX = ev.clientX - model.x
+                                let deltaY = ev.clientY - model.y
+                                let textfordrop = document.getElementById("textfordrop")
+                                let prevX = textfordrop?style?left
+                                let prevY = textfordrop?style?top
+                                textfordrop?style?left <-  (prevX + deltaX) 
+                                textfordrop?style?top <-  (prevY + deltaY) 
+                                {model with x = ev.clientX; y = ev.clientY}, Cmd.none
+                            else model, Cmd.none
 
+    | OnDragEnd ev   -> let textfordrop = document.getElementById("textfordrop")
+                        textfordrop?style?left?Replace (string 333  + "px")
+                        console.log textfordrop?style?left
+                        textfordrop?style?top?Replace (string 359  + "px") 
+                        console.log textfordrop?style?top
+                        {model with isDragging = false}, Cmd.none
                                     
-let inputField (model:Model) (dispatch: Msg -> unit) =
+let modelStats (model:Model) (dispatch: Msg -> unit) =
   Html.div [
     prop.classes [ "field"; "has-addons" ]
     prop.children [
@@ -46,7 +54,7 @@ let inputField (model:Model) (dispatch: Msg -> unit) =
         prop.children [
           Html.input [
             prop.classes [ "input"; "is-medium" ]
-            prop.valueOrDefault model.x
+            prop.valueOrDefault $"x value = {model.x}, y value = {model.y}"
           ]
         ]
       ]
@@ -54,6 +62,7 @@ let inputField (model:Model) (dispatch: Msg -> unit) =
         prop.children [
           Html.button [
             prop.classes [ "button"; "is-primary"; "is-medium" ]
+            prop.draggable true
             prop.children [
               Html.i [ prop.classes [ "fa"; "fa-plus" ] ]
             ]
@@ -63,36 +72,42 @@ let inputField (model:Model) (dispatch: Msg -> unit) =
     ]
   ]
 
-let inputField2 (model:Model) (dispatch: Msg -> unit) =
+let draggableSmthn (model:Model) (dispatch: Msg -> unit) =
+  Html.p [
+    prop.id "textfordrop"
+    prop.text "tryin drop2"
+    prop.onDragStart (fun ev -> dispatch (OnDragStart ev))
+    prop.onDrag (fun ev -> dispatch (OnDrag ev))
+    prop.onDragEnd (fun ev -> dispatch (OnDragEnd ev))  
+    prop.draggable true
+  ]
+
+
+let dropTarget =
     Html.div [
-        prop.id "square"
-        prop.children [
-          Html.canvas [
-            prop.classes [ "button"; "is-primary" ]
-            prop.width 200
-            prop.height 100
-            prop.onMouseDown (fun ev -> dispatch (HandleMouseDown ev))
-            prop.onMouseMove (fun ev -> dispatch (HandleMouseMove ev))
-            prop.onMouseUp (fun ev -> dispatch (HandleMouseUp ev))
-          ]
+        prop.style [style.width 450; style.height 300; style.left 360; style.top 260 ]
+        prop.id "droptarget"
+        prop.classes []
+        prop.draggable true
+        prop.text "23x"                
         ]
-    ]
+
 let appTitle =
   Html.p [
     prop.className "title"
-    prop.text "Elmish To-Do List"
+    prop.text "tryin smthn new111"
   ]
 
 let render (model:Model) (dispatch: Msg -> unit) =
   Html.div [
-    prop.style [ style.padding 20 ]
+    prop.style [ style.padding 30 ]
     prop.children [
       appTitle
-      inputField model dispatch
-      inputField2 model dispatch
+      modelStats model dispatch
+      dropTarget
+      draggableSmthn model dispatch
     ]
   ]
-
 
 Program.mkProgram init update render
 |> Program.withReactSynchronous "elmish-app"
